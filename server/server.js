@@ -8,7 +8,11 @@ const app = express();
 const Project = require('./models/Project');
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ["https://my-portfolio-1-98jw.onrender.com", "http://localhost:3000"],
+    methods: ["GET", "POST"],
+    credentials: true
+}));
 app.use(express.json());
 
 // ✅ DATABASE CONNECTION
