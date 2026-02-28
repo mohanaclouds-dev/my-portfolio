@@ -27,7 +27,7 @@ const Chatbot = () => {
 
     try {
       // ✅ Send message to YOUR Backend
-      const res = await axios.post('https://my-portfolio-t4gb.onrender.com/api/chat', { message: userMessage.text });
+      const res = await axios.post('https://mohana-api.onrender.com/api/chat', { message: userMessage.text });
       
       const botMessage = { text: res.data.reply, sender: "bot" };
       setMessages((prev) => [...prev, botMessage]);
