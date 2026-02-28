@@ -8,7 +8,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // ✅ State for Sidebar
 
   useEffect(() => {
-    axios.get('https://my-portfolio-t4gb.onrender.com/api/projects')
+    axios.get('https://mohana-api.onrender.com/api/projects')
       .then(res => setProjects(res.data))
       .catch(err => console.log("Error fetching projects:", err));
   }, []);
