@@ -3,14 +3,43 @@ import './App.css';
 import axios from 'axios';
 import Chatbot from './Chatbot';
 
+// Helper function for 1st, 2nd, 3rd...
+const getOrdinalSuffix = (i) => {
+    let j = i % 10, k = i % 100;
+    if (j === 1 && k !== 11) return i + "st";
+    if (j === 2 && k !== 12) return i + "nd";
+    if (j === 3 && k !== 13) return i + "rd";
+    return i + "th";
+};
+
 function App() {
   const [projects, setProjects] = useState([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // ✅ State for Sidebar
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [visitorCount, setVisitorCount] = useState(null); // ✅ State for Visitor Count
 
   useEffect(() => {
+    // 1. Fetch Projects
     axios.get('https://mohana-api.onrender.com/api/projects')
       .then(res => setProjects(res.data))
       .catch(err => console.log("Error fetching projects:", err));
+
+    // 2. Fetch/Record Visitor Count
+    const recordVisit = async () => {
+        try {
+            const hasVisited = localStorage.getItem('portfolio_visited');
+            const action = hasVisited ? 'get' : 'increment';
+
+            const res = await axios.post('https://mohana-api.onrender.com/api/visit', { action });
+            setVisitorCount(res.data.count);
+
+            if (!hasVisited) {
+                localStorage.setItem('portfolio_visited', 'true');
+            }
+        } catch (error) {
+            console.error("Error fetching visitor count", error);
+        }
+    };
+    recordVisit();
   }, []);
 
   // ✅ Toggle Menu Function
@@ -342,6 +371,13 @@ function App() {
 
       <footer>
         <p>© 2026 Panadi Mohana Venkata Srinivas. Built with the MERN Stack.</p>
+        
+        {/* ✅ VISITOR COUNTER DISPLAY */}
+        {visitorCount !== null && (
+          <p style={{ marginTop: '10px', fontSize: '0.9rem', color: '#94a3b8' }}>
+            🎉 You are the <strong style={{ color: 'var(--accent)' }}>{getOrdinalSuffix(visitorCount)}</strong> visitor to my portfolio!
+          </p>
+        )}
       </footer>
       <Chatbot />
     </div>
