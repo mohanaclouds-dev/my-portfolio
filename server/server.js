@@ -6,35 +6,11 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 const Project = require('./models/Project');
-// Add this near the top with your other imports
-const Visitor = require('./models/Visitor');
+const Visitor = require('./models/Visitor'); // Visitor model
 
-// Add this below your existing routes
-app.post('/api/visit', async (req, res) => {
-    try {
-        const { action } = req.body; 
-        
-        // Find our single counter document
-        let visitorData = await Visitor.findOne({ name: 'portfolio_visits' });
-        
-        // If it doesn't exist yet, create it starting at 0
-        if (!visitorData) {
-            visitorData = new Visitor({ name: 'portfolio_visits', count: 0 });
-        }
-
-        // Only increase the count if the frontend tells us this is a NEW visitor
-        if (action === 'increment') {
-            visitorData.count += 1;
-            await visitorData.save();
-        }
-
-        res.json({ count: visitorData.count });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server Error');
-    }
-});
-// Middleware
+// ==========================================
+// 1. MIDDLEWARE (MUST BE AT THE TOP!)
+// ==========================================
 app.use(cors({
     origin: ["https://my-portfolio-1-98jw.onrender.com", "http://localhost:3000"],
     methods: ["GET", "POST"],
@@ -42,20 +18,23 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// ✅ DATABASE CONNECTION
+
+// ==========================================
+// 2. DATABASE CONNECTION
+// ==========================================
 const dbURI = "mongodb+srv://mohanasrinivas08_db_user:Mohana%40123@cluster0.rnyjsb5.mongodb.net/portfolio?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose.connect(dbURI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.log("❌ DB Error:", err));
 
-// ✅ GEMINI AI SETUP
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// 🛠️ FIX: Using 'gemini-flash-latest' because it was in your allowed list
+// ==========================================
+// 3. GEMINI AI SETUP
+// ==========================================
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
-// Context: This tells the AI who you are!
 const PORTFOLIO_CONTEXT = `
 You are an AI assistant for Panadi Mohana Venkata Srinivas's portfolio website.
 Your goal is to answer visitor questions professionally and concisely based on his details.
@@ -82,9 +61,35 @@ INSTRUCTIONS:
 - Do not mention you are a bot unless asked.
 `;
 
-// --- ROUTES ---
 
-// 1. Get Projects
+// ==========================================
+// 4. ROUTES
+// ==========================================
+
+// Route A: Visitor Counter
+app.post('/api/visit', async (req, res) => {
+    try {
+        const { action } = req.body; 
+        
+        let visitorData = await Visitor.findOne({ name: 'portfolio_visits' });
+        
+        if (!visitorData) {
+            visitorData = new Visitor({ name: 'portfolio_visits', count: 0 });
+        }
+
+        if (action === 'increment') {
+            visitorData.count += 1;
+            await visitorData.save();
+        }
+
+        res.json({ count: visitorData.count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Route B: Get Projects
 app.get('/api/projects', async (req, res) => {
   try {
     const projects = await Project.find();
@@ -94,7 +99,7 @@ app.get('/api/projects', async (req, res) => {
   }
 });
 
-// 2. Chat with AI Route
+// Route C: Chat with AI
 app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
@@ -111,7 +116,6 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     console.error("❌ AI Error Details:", error.message);
     
-    // Check for quota limits specifically
     if (error.message.includes("429")) {
         return res.status(429).json({ reply: "I'm a bit overwhelmed right now (Rate Limit Reached). Please try again in a minute!" });
     }
@@ -122,5 +126,9 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+
+// ==========================================
+// 5. START SERVER
+// ==========================================
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
