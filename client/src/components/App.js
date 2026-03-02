@@ -15,7 +15,8 @@ const getOrdinalSuffix = (i) => {
 function App() {
   const [projects, setProjects] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [visitorCount, setVisitorCount] = useState(null); // ✅ State for Visitor Count
+  const [visitorCount, setVisitorCount] = useState(null);
+  const [showToast, setShowToast] = useState(true); // ✅ State to control the popup notification
 
   useEffect(() => {
     // 1. Fetch Projects
@@ -155,6 +156,41 @@ function App() {
   return (
     <div className="app-container">
       
+      {/* ✅ FLOATING VISITOR NOTIFICATION */}
+      {visitorCount !== null && showToast && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          backgroundColor: '#1e293b',
+          color: '#f8fafc',
+          padding: '15px 25px',
+          borderRadius: '8px',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '20px',
+          borderLeft: '4px solid #38bdf8',
+          animation: 'slideIn 0.5s ease-out'
+        }}>
+          <span>🎉 You are the <strong style={{ color: '#38bdf8' }}>{getOrdinalSuffix(visitorCount)}</strong> visitor!</span>
+          <button 
+            onClick={() => setShowToast(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#94a3b8',
+              fontSize: '1.2rem',
+              cursor: 'pointer',
+              padding: '0'
+            }}
+          >
+            ✖
+          </button>
+        </div>
+      )}
+
       {/* --- NAVIGATION --- */}
       <nav className="navbar">
         <div className="logo">MVS<span>.DEV</span></div>
@@ -284,7 +320,6 @@ function App() {
         <h2>Featured Projects</h2>
         <div className="projects-grid">
           {projects.length > 0 ? projects.map((project) => {
-            // ✅ CONDITIONAL: Only color the "Secure" project icon, make others white
             const isColorful = project.title.includes("Secure");
 
             return (
@@ -371,13 +406,7 @@ function App() {
 
       <footer>
         <p>© 2026 Panadi Mohana Venkata Srinivas. Built with the MERN Stack.</p>
-        
-        {/* ✅ VISITOR COUNTER DISPLAY */}
-        {visitorCount !== null && (
-          <p style={{ marginTop: '10px', fontSize: '0.9rem', color: '#94a3b8' }}>
-            🎉 You are the <strong style={{ color: 'var(--accent)' }}>{getOrdinalSuffix(visitorCount)}</strong> visitor to my portfolio!
-          </p>
-        )}
+        {/* Old visitor text removed from here! */}
       </footer>
       <Chatbot />
     </div>
