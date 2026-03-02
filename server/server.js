@@ -6,7 +6,34 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 const Project = require('./models/Project');
+// Add this near the top with your other imports
+const Visitor = require('./models/Visitor');
 
+// Add this below your existing routes
+app.post('/api/visit', async (req, res) => {
+    try {
+        const { action } = req.body; 
+        
+        // Find our single counter document
+        let visitorData = await Visitor.findOne({ name: 'portfolio_visits' });
+        
+        // If it doesn't exist yet, create it starting at 0
+        if (!visitorData) {
+            visitorData = new Visitor({ name: 'portfolio_visits', count: 0 });
+        }
+
+        // Only increase the count if the frontend tells us this is a NEW visitor
+        if (action === 'increment') {
+            visitorData.count += 1;
+            await visitorData.save();
+        }
+
+        res.json({ count: visitorData.count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
 // Middleware
 app.use(cors({
     origin: ["https://my-portfolio-1-98jw.onrender.com", "http://localhost:3000"],
