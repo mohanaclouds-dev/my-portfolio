@@ -16,10 +16,10 @@ function App() {
   const [projects, setProjects] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [visitorCount, setVisitorCount] = useState(null);
-  const [showToast, setShowToast] = useState(true); // ✅ State to control the popup notification
+  const [showToast, setShowToast] = useState(true);
 
   useEffect(() => {
-    // 1. Fetch Projects
+    // 1. Fetch Database Projects
     axios.get('https://mohana-api.onrender.com/api/projects')
       .then(res => setProjects(res.data))
       .catch(err => console.log("Error fetching projects:", err));
@@ -55,11 +55,10 @@ function App() {
 
   // ✅ HELPER: Forces images to show even if Database is empty/broken
   const getProjectImage = (title) => {
-    if (title.includes("Cloak")) return "https://cdn-icons-png.flaticon.com/512/3022/3022251.png"; // Luggage Icon
-    if (title.includes("Secure")) return "https://cdn-icons-png.flaticon.com/512/2716/2716652.png"; // Lock Icon
-    if (title.includes("Music")) return "https://cdn-icons-png.flaticon.com/512/461/461238.png";    // Music Icon
-    if (title.includes("AI Research")) return "https://cdn-icons-png.flaticon.com/512/2083/2083213.png";
-    return "https://cdn-icons-png.flaticon.com/512/1087/1087815.png"; // Default Code Icon
+    if (title.includes("Cloak")) return "https://cdn-icons-png.flaticon.com/512/3022/3022251.png"; 
+    if (title.includes("Secure")) return "https://cdn-icons-png.flaticon.com/512/2716/2716652.png"; 
+    if (title.includes("Music")) return "https://cdn-icons-png.flaticon.com/512/461/461238.png";    
+    return "https://cdn-icons-png.flaticon.com/512/1087/1087815.png"; 
   };
 
   // ✅ INTERNSHIP DATA
@@ -196,7 +195,7 @@ function App() {
       <nav className="navbar">
         <div className="logo">MVS<span>.DEV</span></div>
         
-        {/* Desktop Menu (Hidden on Mobile) */}
+        {/* Desktop Menu */}
         <ul className="nav-links desktop-menu">
           <li><a href="#about">About</a></li>
           <li><a href="#skills">Skills</a></li>
@@ -206,17 +205,13 @@ function App() {
           <li><a href="#contact">Contact</a></li>
         </ul>
 
-        {/* ✅ Hamburger Icon (Visible on Mobile) */}
+        {/* Mobile Nav */}
         <div className="hamburger" onClick={toggleMenu}>
           <div className={`bar ${isSidebarOpen ? 'active' : ''}`}></div>
           <div className={`bar ${isSidebarOpen ? 'active' : ''}`}></div>
           <div className={`bar ${isSidebarOpen ? 'active' : ''}`}></div>
         </div>
-
-        {/* ✅ Mobile Sidebar Overlay */}
         <div className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} onClick={closeMenu}></div>
-
-        {/* ✅ Mobile Sidebar Menu */}
         <div className={`mobile-sidebar ${isSidebarOpen ? 'open' : ''}`}>
           <span className="close-btn" onClick={closeMenu}>&times;</span>
           <ul className="mobile-nav-links">
@@ -320,6 +315,35 @@ function App() {
       <section id="projects" className="section-container">
         <h2>Featured Projects</h2>
         <div className="projects-grid">
+          
+          {/* ✅ HARDCODED AI PROJECT CARD */}
+          <div className="card project-card">
+            <div className="project-img-wrapper" style={{background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+              <img 
+                src="https://cdn-icons-png.flaticon.com/512/2083/2083213.png" 
+                alt="AI Research Assistant" 
+                style={{ width: '80px', height: '80px', objectFit: 'contain' }}
+              />
+            </div>
+            <div className="project-content">
+              <h3>AI Research Assistant</h3>
+              <span className="role-tag">AI / Full Stack Developer</span>
+              <p style={{ marginBottom: '15px', color: '#cbd5e1' }}>
+                An intelligent web application powered by AI designed to help users gather, analyze, and summarize research information efficiently.
+              </p>
+              <div className="tags">
+                <span>React</span>
+                <span>Node.js</span>
+                <span>AI/LLM</span>
+                <span>Render</span>
+              </div>
+              <a href="https://ai-research-assistant-qjox.onrender.com/" target="_blank" rel="noreferrer" className="link-btn group">
+                View Project <span className="arrow">→</span>
+              </a>
+            </div>
+          </div>
+
+          {/* DYNAMIC DATABASE PROJECTS */}
           {projects.length > 0 ? projects.map((project) => {
             const isColorful = project.title.includes("Secure");
 
@@ -407,7 +431,6 @@ function App() {
 
       <footer>
         <p>© 2026 Panadi Mohana Venkata Srinivas. Built with the MERN Stack.</p>
-        {/* Old visitor text removed from here! */}
       </footer>
       <Chatbot />
     </div>
