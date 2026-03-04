@@ -58,6 +58,7 @@ function App() {
     if (title.includes("Cloak")) return "https://cdn-icons-png.flaticon.com/512/3022/3022251.png"; // Luggage Icon
     if (title.includes("Secure")) return "https://cdn-icons-png.flaticon.com/512/2716/2716652.png"; // Lock Icon
     if (title.includes("Music")) return "https://cdn-icons-png.flaticon.com/512/461/461238.png";    // Music Icon
+    if (title.includes("AI Research")) return "https://cdn-icons-png.flaticon.com/512/2083/2083213.png";
     return "https://cdn-icons-png.flaticon.com/512/1087/1087815.png"; // Default Code Icon
   };
 
