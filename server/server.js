@@ -116,8 +116,14 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     console.error("❌ AI Error Details:", error.message);
     
-    if (error.message.includes("429")) {
-        return res.status(429).json({ reply: "I'm a bit overwhelmed right now (Rate Limit Reached). Please try again in a minute!" });
+    // 1. Catch the Rate Limit / Quota Error
+    if (error.message.includes("429") || error.message.includes("Quota") || error.message.includes("limit")) {
+        return res.json({ reply: "I'm receiving too many messages right now! Please wait about 30 seconds and ask me again." });
+    }
+
+    // 2. Catch the Google Server Overload Error
+    if (error.message.includes("503") || error.message.includes("high demand")) {
+        return res.json({ reply: "Google's AI servers are a bit overloaded at the moment. Please try asking me again in a minute!" });
     }
 
     res.status(500).json({ 
